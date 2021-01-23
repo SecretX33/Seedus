@@ -1,0 +1,38 @@
+############################################################
+# +------------------------------------------------------+ #
+# |                        @name@                        | #
+# +------------------------------------------------------+ #
+############################################################
+
+# Plugin created by SecretX (github.com/SecretX33) under GPL v3.0 or later
+# Version @version@
+
+# This file will NEVER get modified after being created, when updating please make sure you rename this one and let a new one be created, and copy your old configs to the new config file.
+
+############################################################
+# +------------------------------------------------------+ #
+# |                       Help Me                        | #
+# +------------------------------------------------------+ #
+############################################################
+
+# This plugin allows change to automatically replant any seed that is dropped after X seconds if there is valid soil below or sideways to the seed
+
+# Radius needed to check each block around the seed, with 0 being the block right below the seed
+#
+# 2 2 2 2 2
+# 2 1 1 1 2
+# 2 1 0 1 2
+# 2 1 1 1 2
+# 2 2 2 2 2
+
+############################################################
+# +------------------------------------------------------+ #
+# |                   General Settings                   | #
+# +------------------------------------------------------+ #
+############################################################
+
+general:
+  # Time, in seconds, to wait to verify if a dropped seed should be replanted; valid values are any number between 0.5 and 10.0; default is 1.5
+  time-to-replant: 1.5
+  # Distance from the seed to search for empty farmlands; 0 will just check the block underneath the seed, 1 will create a 3x3 because it's the block below it and more one for all directions, 2 will create a 5x5 grid, in a cube shaped form; valid values are integers between 0 and 20, default is 2
+  radius-to-replant: 2

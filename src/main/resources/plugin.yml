@@ -1,0 +1,25 @@
+name: @name@
+version: @version@
+main: io.github.secretx33.seedus.Main
+api-version: 1.16
+authors: [SecretX]
+description: This plugin allows quick replant of seeds.
+website: https://github.com/SecretX33
+
+commands:
+  seedus:
+    description: @name@
+    usage: /<command>
+
+permissions:
+  seedus.*:
+    description: Gives access to all @name@ commands
+    children:
+      msc.reload: true
+      msc.debug: true
+  seedus.reload:
+    description: Allows you to reload the plugin config
+    default: op
+  seedus.debug:
+    description: Allows you to toggle debug mode (for developers only)
+    default: op
