@@ -4,7 +4,7 @@ Automate your farms.
 
 ## Features
 
-This is a plugin for minecraft bukkit/spigot/etc servers that allows you to easily replant seeds and create fully automatic farms. Any dropped seeds will be replanted after a certain (configurable) amount of time if there is a farmland block nearby (range also configurable).
+This is a plugin for Minecraft Bukkit/Spigot/etc servers that allows you to easily replant seeds and create fully automatic farms. Any dropped seeds (including those dropped by blocks, entities, or players) will be replanted after a certain (configurable) amount of time if there is a farmland block nearby (range also configurable).
 
 ## Download
 
