@@ -16,7 +16,7 @@ Or if you want to download an earlier version of the plugin, you can do it by ch
 
 **Q:** What kinds of crop does this plugin auto replant?
 
-**A:** Currently, it auto replants WHEAT_SEEDS, PUMPKIN_SEEDS, BEETROOT_SEEDS, MELON_SEEDS, CARROT, COCOA_BEANS and POTATO.
+**A:** Currently, it auto replants Wheat Seeds, Pumpkin Seeds, Beetroot Seeds, Melon Seeds, Carrot, Cocoa Beans, and Potato.
 
 ### Chat commands
 
