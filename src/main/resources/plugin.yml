@@ -1,6 +1,6 @@
-name: @name@
-version: @version@
-main: io.github.secretx33.seedus.Main
+name: ${name}
+version: ${version}
+main: ${mainClass}
 api-version: 1.16
 authors: [SecretX]
 description: This plugin allows quick replant of seeds.
@@ -8,12 +8,12 @@ website: https://github.com/SecretX33
 
 commands:
   seedus:
-    description: @name@
+    description: ${name}
     usage: /<command>
 
 permissions:
   seedus.*:
-    description: Gives access to all @name@ commands
+    description: Gives access to all ${name} commands
     children:
       msc.reload: true
       msc.debug: true

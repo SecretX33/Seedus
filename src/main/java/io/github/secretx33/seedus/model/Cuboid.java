@@ -14,21 +14,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Seedus.  If not, see <https://www.gnu.org/licenses/>.
 */
-package io.github.secretx33.seedus;
+package io.github.secretx33.seedus.model;
 
-import io.github.secretx33.seedus.Utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
-@ParametersAreNonnullByDefault
 public class Cuboid {
 
     private final int xMin;
@@ -64,11 +62,79 @@ public class Cuboid {
         this.refLocation = new Location(refLocation.getWorld(), refLocation.getX(), refLocation.getY(), refLocation.getZ());
     }
 
+    public Set<Block> bordersBlockList() {
+        final Set<Block> blockList = new LinkedHashSet<>();
+
+        // For all heights
+        for (int y = this.yMin; y <= this.yMax ; ++y) {
+            // Get North and South Walls
+            for (int x = this.xMin; x <= this.xMax; ++x) {
+                final Block southBlock = this.world.getBlockAt(x, y, zMin);
+                blockList.add(southBlock);
+
+                final Block northBlock = this.world.getBlockAt(x, y, zMax);
+                blockList.add(northBlock);
+            }
+
+            // Get West and East Walls
+            for (int z = this.zMin; z <= this.zMax; ++z) {
+                final Block eastBlock = this.world.getBlockAt(xMin, y, z);
+                blockList.add(eastBlock);
+
+                final Block westBlock = this.world.getBlockAt(xMax, y, z);
+                blockList.add(westBlock);
+            }
+        }
+
+        return blockList;
+    }
+
+    public Set<Block> allSidesBlockList() {
+        final Set<Block> blockList = new LinkedHashSet<>();
+
+        // Adding floor and ceil of cube
+        for (int x = this.xMin; x <= this.xMax; ++x) {
+            for (int z = this.zMin; z <= this.zMax; ++z) {
+                final Block floor = this.world.getBlockAt(x, yMin, z);
+                blockList.add(floor);
+
+                final Block ceil = this.world.getBlockAt(x, yMax, z);
+                blockList.add(ceil);
+            }
+        }
+
+        // There is no walls on this cuboid, just floor and ceil
+        if ((yMax - yMin) < 3) return blockList;
+
+        // For all block in between floor and ceil
+        for (int y = this.yMin + 1; y <= this.yMax - 1; ++y) {
+            // Get North and South Walls
+            for (int x = this.xMin; x <= this.xMax; ++x) {
+                final Block southBlock = this.world.getBlockAt(x, y, zMin);
+                blockList.add(southBlock);
+
+                final Block northBlock = this.world.getBlockAt(x, y, zMax);
+                blockList.add(northBlock);
+            }
+
+            // Get West and East Walls
+            for (int z = this.zMin; z <= this.zMax; ++z) {
+                final Block eastBlock = this.world.getBlockAt(xMin, y, z);
+                blockList.add(eastBlock);
+
+                final Block westBlock = this.world.getBlockAt(xMax, y, z);
+                blockList.add(westBlock);
+            }
+        }
+
+        return blockList;
+    }
+
     public List<Block> blockList() {
         final List<Block> blockList = new ArrayList<>(this.getTotalBlockSize());
-        for(int x = this.xMin; x <= this.xMax; ++x) {
-            for(int y = this.yMin; y <= this.yMax; ++y) {
-                for(int z = this.zMin; z <= this.zMax; ++z) {
+        for (int x = this.xMin; x <= this.xMax; ++x) {
+            for (int y = this.yMin; y <= this.yMax; ++y) {
+                for (int z = this.zMin; z <= this.zMax; ++z) {
                     final Block b = this.world.getBlockAt(x, y, z);
                     blockList.add(b);
                 }
@@ -78,13 +144,13 @@ public class Cuboid {
         blockList.sort((o1, o2) -> {
             final double o1DistanceFromRef = getDistanceFromRef(o1.getLocation());
             final double o2DistanceFromRef = getDistanceFromRef(o2.getLocation());
-//            Utils.debugMessage(String.format("[1] Block %s %s %s is %s away from the center\n[2] block %s %s %s is %s away from the center", o1.getX(), o1.getY(), o1.getZ(), o1DistanceFromRef, o2.getX(), o2.getY(), o2.getZ(), o2DistanceFromRef));
+//            log.messageDebug(String.format("[1] Block %s %s %s is %s away from the center\n[2] block %s %s %s is %s away from the center", o1.getX(), o1.getY(), o1.getZ(), o1DistanceFromRef, o2.getX(), o2.getY(), o2.getZ(), o2DistanceFromRef));
             return Double.compare(o1DistanceFromRef, o2DistanceFromRef);
         });
         return blockList;
     }
 
-    private double getDistanceFromRef(Location loc){
+    private double getDistanceFromRef(Location loc) {
         // 0.9375 is the height of the farmland
         return Math.sqrt(Math.pow((loc.getX() + 0.5) - refLocation.getX(), 2) + Math.pow((loc.getY() + 0.9375) - refLocation.getY(), 2) + Math.pow((loc.getZ() + 0.5) - refLocation.getZ(), 2));
     }
@@ -113,7 +179,6 @@ public class Cuboid {
         return new Location(this.world, this.xMax, this.yMax, this.zMax);
     }
 
-    @NotNull
     public Location getRandomLocation() {
         final Random rand = new Random();
         final int x = rand.nextInt(Math.abs(this.xMax - this.xMin) + 1) + this.xMin;
