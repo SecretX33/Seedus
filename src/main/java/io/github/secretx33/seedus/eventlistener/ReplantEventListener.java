@@ -92,9 +92,11 @@ public class ReplantEventListener implements Listener {
      */
     private boolean isWaterNearby(Item itemDrop) {
         final int range = 1;
+        final int yMin = (int) Math.round(Math.max(LOWER_LIMIT, Math.min(UPPER_LIMIT, Math.round(itemDrop.getLocation().getY()))));
+        final double yMax = Math.min(UPPER_LIMIT, Math.round(itemDrop.getLocation().getY() + 1));
 
         for (int x = itemDrop.getLocation().getBlockX() - range; x <= itemDrop.getLocation().getBlockX() + range; x++) {
-            for (int y = (int)Math.round(Math.max(LOWER_LIMIT, Math.min(UPPER_LIMIT, Math.round(itemDrop.getLocation().getY())))); y <= Math.min(UPPER_LIMIT, Math.round(itemDrop.getLocation().getY() + 1)); y++) {
+            for (int y = yMin; y <= yMax; y++) {
                 if (itemDrop.getWorld().getBlockAt(x, y, itemDrop.getLocation().getBlockZ()).isLiquid()) {
                     log.messageDebug("There are liquid around this location in block %s, %s, %s", x, y, itemDrop.getLocation().getBlockZ());
                     return true;
@@ -102,7 +104,7 @@ public class ReplantEventListener implements Listener {
             }
         }
 
-        for (int y = (int)Math.round(Math.max(LOWER_LIMIT, Math.min(UPPER_LIMIT, Math.round(itemDrop.getLocation().getY())))); y <= Math.min(UPPER_LIMIT, Math.round(itemDrop.getLocation().getY() + 1)); y++) {
+        for (int y = yMin; y <= yMax; y++) {
             for (int z = itemDrop.getLocation().getBlockZ() - range; z <= itemDrop.getLocation().getBlockZ() + range; z++) {
                 if (itemDrop.getWorld().getBlockAt(itemDrop.getLocation().getBlockX(), y, z).isLiquid()) {
                     log.messageDebug("There are liquid around this location in block %s, %s, %s", itemDrop.getLocation().getBlockX(), y, z);
