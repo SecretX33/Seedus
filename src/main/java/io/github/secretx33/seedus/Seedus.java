@@ -36,7 +36,7 @@ public class Seedus extends JavaPlugin {
     @Override
     public void onEnable() {
         JavaPlugin plugin = this;
-        Toothpick.setConfiguration(Configuration.forDevelopment());
+        Toothpick.setConfiguration(Configuration.forProduction());
         Scope scope = Toothpick.openScope(this, inject -> inject.installModules(new Module() {{
             bind(Plugin.class).toInstance(plugin);
             bind(JavaPlugin.class).toInstance(plugin);
