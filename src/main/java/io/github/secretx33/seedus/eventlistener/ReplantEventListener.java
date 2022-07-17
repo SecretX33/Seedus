@@ -17,10 +17,10 @@ along with Seedus.  If not, see <https://www.gnu.org/licenses/>.
 package io.github.secretx33.seedus.eventlistener;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import io.github.secretx33.seedus.config.Config;
 import io.github.secretx33.seedus.model.Cuboid;
 import io.github.secretx33.seedus.util.PluginLogger;
-import io.github.secretx33.seedus.util.TpsWatcher;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -44,20 +44,27 @@ public class ReplantEventListener implements Listener {
 
     private static final double LOWER_LIMIT = 0;
     private static final double UPPER_LIMIT = 255;
+    private static final ImmutableMap<Material, Material> SEEDS_TO_PLANT_TYPE = ImmutableMap.<Material, Material>builder()
+        .put(Material.WHEAT_SEEDS, Material.WHEAT)
+        .put(Material.PUMPKIN_SEEDS, Material.PUMPKIN_STEM)
+        .put(Material.BEETROOT_SEEDS, Material.BEETROOTS)
+        .put(Material.MELON_SEEDS, Material.MELON_STEM)
+        .put(Material.CARROT, Material.CARROTS)
+        .put(Material.COCOA_BEANS, Material.COCOA)
+        .put(Material.POTATO, Material.POTATOES)
+        .build();
 
     private final Plugin plugin;
     private final BukkitScheduler scheduler;
     private final Config config;
     private final PluginLogger log;
-    private final TpsWatcher tpsWatcher;
 
     @Inject
-    public ReplantEventListener(Plugin plugin, Config config, PluginLogger log, TpsWatcher tpsWatcher) {
+    public ReplantEventListener(Plugin plugin, Config config, PluginLogger log) {
         this.plugin = plugin;
         this.scheduler = plugin.getServer().getScheduler();
         this.config = config;
         this.log = log;
-        this.tpsWatcher = tpsWatcher;
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -71,8 +78,8 @@ public class ReplantEventListener implements Listener {
             return;
         }
 
-        final Material cropMaterial = getBlockForCrop(item.getType());
-        if (cropMaterial == null) {
+        final Material plantType = getPlantTypeByCrop(item.getType());
+        if (plantType == null) {
             // Item is not a seed/crop, just silently return
             return;
         }
@@ -82,7 +89,7 @@ public class ReplantEventListener implements Listener {
         }
 
         final long now = System.nanoTime();
-        final long delayInTicks = (long) (Math.ceil(config.getReplantDelay() * (double) tpsWatcher.currentTps()) + 1.0);
+        final long delayInTicks = (long) Math.ceil(config.getReplantDelay() * 20.0);
         scheduler.runTaskLater(plugin, () -> replantCropSeeds(itemDrop, item, now), delayInTicks);
     }
 
@@ -117,7 +124,7 @@ public class ReplantEventListener implements Listener {
 
     private void replantCropSeeds(Item itemDrop, ItemStack item, long start) {
         final Location itemLocation = itemDrop.getLocation();
-        log.messageDebug("Item dropped at %s %s %s (%s %s %s)", Math.round(itemLocation.getX()*100f)/100f, Math.round(itemLocation.getY()*100f)/100f, Math.round(itemLocation.getZ()*100f)/100f, itemLocation.getBlockX(), itemLocation.getBlockY(), itemLocation.getBlockZ());
+        log.messageDebug("Item dropped at %s %s %s (%s %s %s)", Math.round(itemLocation.getX() * 100f) / 100f, Math.round(itemLocation.getY() * 100f) / 100f, Math.round(itemLocation.getZ()*100f) / 100f, itemLocation.getBlockX(), itemLocation.getBlockY(), itemLocation.getBlockZ());
 
         final Cuboid cuboid = new Cuboid(getLowerBounds(itemLocation), getUpperBounds(itemLocation), itemLocation);
         final List<Block> blocks = cuboid.blockList();
@@ -129,12 +136,11 @@ public class ReplantEventListener implements Listener {
                 itemStack.setAmount(itemStack.getAmount() - 1);
                 if (itemStack.getAmount() == 0) {
                     // There is no more seeds to be planted
-//                    itemDrop.remove();
                     break;
                 }
             }
         }
-        log.messageDebug("Replanting task ran after %.2fs. TPS: %s", (System.nanoTime() - start) / 1_000_000_000.0, tpsWatcher.currentTps());
+        log.messageDebug("Replanting task ran after %.2fs", (System.nanoTime() - start) / 1_000_000_000.0);
     }
 
     private Location getLowerBounds(Location itemLocation) {
@@ -157,22 +163,15 @@ public class ReplantEventListener implements Listener {
         Preconditions.checkArgument(block.getType() == Material.FARMLAND, "Block passed as argument is not a Farmland block");
         log.messageDebug("Farmland found at %s %s %s", block.getX(), block.getY(), block.getZ());
 
-        final Material cropBlockType = getBlockForCrop(item.getType());
-        if (cropBlockType != null) {
-            block.getWorld().getBlockAt(getLocationOnTop(block.getLocation())).setType(cropBlockType);
+        final Material plantType = getPlantTypeByCrop(item.getType());
+        if (plantType != null) {
+            getBlockOnTop(block).setType(plantType);
         }
     }
 
     @Nullable
-    private Material getBlockForCrop(Material material) {
-        if (material == Material.WHEAT_SEEDS) return Material.WHEAT;
-        if (material == Material.PUMPKIN_SEEDS) return Material.PUMPKIN_STEM;
-        if (material == Material.BEETROOT_SEEDS) return Material.BEETROOTS;
-        if (material == Material.MELON_SEEDS) return Material.MELON_STEM;
-        if (material == Material.CARROT) return Material.CARROTS;
-        if (material == Material.COCOA_BEANS) return Material.COCOA;
-        if (material == Material.POTATO) return Material.POTATOES;
-        return null;
+    private Material getPlantTypeByCrop(Material material) {
+        return SEEDS_TO_PLANT_TYPE.get(material);
     }
 
     private boolean isBlockValid(Block block) {

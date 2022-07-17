@@ -19,18 +19,23 @@ package io.github.secretx33.seedus.command;
 import io.github.secretx33.seedus.config.Config;
 import io.github.secretx33.seedus.model.Messages;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
-public class Commands implements CommandExecutor {
+public class Commands implements TabExecutor {
 
     private static final String PLUGIN_COMMAND_NAME = "seedus";
     private static final String PLUGIN_PERMISSION_PREFIX = "seedus";
+    private static final List<String> SUBCOMMANDS = Arrays.asList("reload", "debug");
 
     private final Config config;
 
@@ -71,4 +76,16 @@ public class Commands implements CommandExecutor {
 
         return true;
     }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length != 1) {
+            return Collections.emptyList();
+        }
+        String hint = args[0].toLowerCase(Locale.US);
+        return SUBCOMMANDS.stream()
+            .filter(subCommand -> subCommand.startsWith(hint))
+            .collect(Collectors.toList());
+    }
+
 }

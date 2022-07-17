@@ -67,7 +67,7 @@ public class Config {
 
         // Parsing configs
         String field = "time-to-replant";
-        replantDelay = 1.2;
+        replantDelay = 1.5;
         if (general.isSet(field)) {
             replantDelay = Math.max(0.5, Math.min(10.0, general.getDouble(field)));
         } else {
@@ -75,10 +75,9 @@ public class Config {
         }
 
         field = "radius-to-replant";
-        replantRadius = 3;
+        replantRadius = 2;
         if (general.isSet(field)) {
-            String s = general.getString(field);
-            replantRadius = (int)Math.max(0, Math.min(20, general.getDouble(field)));
+            replantRadius = Math.max(0, Math.min(20, general.getInt(field)));
         } else {
             log.message(Messages.ENTRY_NOT_FOUND, field);
         }

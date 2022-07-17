@@ -19,6 +19,7 @@ package io.github.secretx33.seedus;
 import io.github.secretx33.seedus.command.Commands;
 import io.github.secretx33.seedus.eventlistener.ReplantEventListener;
 import io.github.secretx33.seedus.util.PluginLogger;
+import io.github.secretx33.seedus.util.ConfigurationUtil;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -27,7 +28,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import toothpick.Scope;
 import toothpick.Toothpick;
 import toothpick.config.Module;
-import toothpick.configuration.Configuration;
 
 public class Seedus extends JavaPlugin {
 
@@ -35,8 +35,9 @@ public class Seedus extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        long start = System.nanoTime();
         JavaPlugin plugin = this;
-        Toothpick.setConfiguration(Configuration.forProduction());
+        Toothpick.setConfiguration(ConfigurationUtil.getEnvConfiguration());
         Scope scope = Toothpick.openScope(this, inject -> inject.installModules(new Module() {{
             bind(Plugin.class).toInstance(plugin);
             bind(JavaPlugin.class).toInstance(plugin);
@@ -47,7 +48,7 @@ public class Seedus extends JavaPlugin {
 
         registerEventListeners(scope.getInstance(ReplantEventListener.class));
         scope.getInstance(Commands.class);
-        log.message("loaded.");
+        log.message("Loaded in %.2fs.", (System.nanoTime() - start) / 1_000_000_000.0);
     }
 
     private void registerEventListeners(Listener... eventListeners) {
@@ -61,7 +62,7 @@ public class Seedus extends JavaPlugin {
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);
         Toothpick.closeScope(this);
-        log.message("disabled.");
+        log.message("Disabled.");
     }
 
 }

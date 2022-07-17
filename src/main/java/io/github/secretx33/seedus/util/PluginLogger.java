@@ -28,7 +28,7 @@ import javax.inject.Singleton;
 @Singleton
 public class PluginLogger {
 
-    private static final String CHAT_CONSOLE_PREFIX = ChatColor.DARK_GREEN + "[" + Messages.PLUGIN_NAME + "] " + ChatColor.GRAY;
+    static final String CHAT_CONSOLE_PREFIX = ChatColor.DARK_GREEN + "[" + Messages.PLUGIN_NAME + "] " + ChatColor.GRAY;
 
     /**
      * Lazy (pun not intended) fix for the circular dependency issue.
@@ -47,7 +47,7 @@ public class PluginLogger {
     }
 
     public void message(String msg, Object... args) {
-        message(String.format(CHAT_CONSOLE_PREFIX + msg, args));
+        message(String.format(msg, args));
     }
 
     public void messageDebug(String msg) {
